@@ -1,0 +1,33 @@
+{
+  "name": "mern-starter-boilerplate",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": "10.12.0",
+    "npm": "6.4.1"
+  },
+  "scripts": {
+    "start": "npm run server",
+    "client": "cd client && npm start",
+    "server": "node ./bin/www",
+    "heroku-postbuild": "cd client && npm install --only=dev && npm install --save-exact && npm run build"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "dotenv": "^6.1.0",
+    "express": "~4.16.0",
+    "express-sslify": "^1.2.0",
+    "helmet": "^3.14.0",
+    "jsonwebtoken": "^8.3.0",
+    "lodash": "^4.17.11",
+    "mongoose": "^5.3.4",
+    "morgan": "~1.9.0",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0"
+  }
+}
