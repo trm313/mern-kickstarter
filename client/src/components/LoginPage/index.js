@@ -3,7 +3,17 @@ import axios from "axios";
 import { connect } from "react-redux";
 import { Redirect, Link } from "react-router-dom";
 
+import io from "socket.io-client";
+import OAuth from "./OAuth";
+
 import { logInUser } from "./operations";
+
+const googleImg = require("../../assets/style/img/icons/common/google.svg");
+const githubImg = require("../../assets/style/img/icons/common/github.svg");
+
+const socket = io("http://localhost:3001");
+
+const providers = ["twitter", "google"];
 
 class LoginPage extends Component {
   constructor(props) {
@@ -59,10 +69,36 @@ class LoginPage extends Component {
     });
   };
 
+  setLoading = bool => {
+    this.setState({ loading: bool });
+  };
+
+  renderOAuthButtons = () => {
+    return providers.map(provider => {
+      return (
+        <OAuth
+          provider={provider}
+          socket={socket}
+          key={provider}
+          logInUser={this.props.logInUser}
+          setLoading={this.setLoading}
+        />
+      );
+    });
+  };
+
   render() {
+    /*
+    <OAuth
+      provider={"twitter"}
+      key={"twitter"}
+      socket={socket}
+    />
+    */
     const { from } = this.props.location.state || {
       from: { pathname: "/dashboard" }
     };
+
     return (
       <div>
         {this.props.authenticated && <Redirect to={from} />}
@@ -87,18 +123,7 @@ class LoginPage extends Component {
                         <small>Sign in with</small>
                       </div>
                       <div className="btn-wrapper text-center">
-                        <a href="#" className="btn btn-neutral btn-icon">
-                          <span className="btn-inner--icon">
-                            <img src="../assets/img/icons/common/github.svg" />
-                          </span>
-                          <span className="btn-inner--text">Github</span>
-                        </a>
-                        <a href="#" className="btn btn-neutral btn-icon">
-                          <span className="btn-inner--icon">
-                            <img src="../assets/img/icons/common/google.svg" />
-                          </span>
-                          <span className="btn-inner--text">Google</span>
-                        </a>
+                        {this.renderOAuthButtons()}
                       </div>
                     </div>
                     <div className="card-body px-lg-5 py-lg-5">
