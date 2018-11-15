@@ -1,5 +1,12 @@
 import React, { Component } from "react";
 
+const socialIcons = {
+  google: require("../../../assets/style/img/icons/common/google.svg"),
+  facebook: require("../../../assets/style/img/icons/common/facebook.svg"),
+  twitter: require("../../../assets/style/img/icons/common/twitter.svg"),
+  github: require("../../../assets/style/img/icons/common/github.svg")
+};
+
 export default class OAuth extends Component {
   state = {
     user: {},
@@ -49,18 +56,16 @@ export default class OAuth extends Component {
       const { popup } = this;
       if (!popup || popup.closed || popup.closed === undefined) {
         clearInterval(check);
-        this.setState({ disabled: "" });
+        this.props.setLoading(false);
       }
     }, 1000);
   }
 
   startAuth = () => {
-    if (!this.state.disabled) {
-      // this.props.setLoading(true);
-      this.popup = this.openPopup();
-      this.checkPopup();
-      this.setState({ disabled: "disabled" });
-    }
+    this.props.setLoading(true);
+    this.popup = this.openPopup();
+    this.checkPopup();
+    this.setState({ disabled: "disabled" });
   };
 
   closeCard = () => {
@@ -73,12 +78,16 @@ export default class OAuth extends Component {
     const { disabled } = this.state;
 
     return (
-      <div className="btn btn-neutral btn-icon" onClick={this.startAuth}>
+      <button
+        className="btn btn-neutral btn-icon"
+        onClick={this.startAuth}
+        disabled={this.props.loading}
+      >
         <span className="btn-inner--icon">
-          <img src="#" />
+          <img src={socialIcons[provider]} />
         </span>
         <span className="btn-inner--text">{provider}</span>
-      </div>
+      </button>
     );
   }
 }

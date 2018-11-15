@@ -11,9 +11,6 @@ import LoadingSuccessFail from "../UI/LoadingSuccessFail";
 
 import { logInUser } from "./operations";
 
-const googleImg = require("../../assets/style/img/icons/common/google.svg");
-const githubImg = require("../../assets/style/img/icons/common/github.svg");
-
 const socket = io("http://localhost:3001");
 
 const providers = ["twitter", "google"];
@@ -29,22 +26,12 @@ class LoginPage extends Component {
       error: null,
       errorMsg: null,
       loading: false,
-      success: false,
-      fail: false,
       register: qs.parse(this.props.location.search).register ? true : false
     };
   }
 
   toggleForm = () => {
     this.setState({ register: !this.state.register });
-  };
-
-  successCallback = () => {
-    // Log User In
-  };
-
-  failCallback = () => {
-    this.setState({ success: false, fail: false, loading: false });
   };
 
   onChange = event => {
@@ -170,6 +157,7 @@ class LoginPage extends Component {
           key={provider}
           logInUser={this.props.logInUser}
           setLoading={this.setLoading}
+          loading={this.state.loading}
         />
       );
     });
@@ -278,13 +266,6 @@ class LoginPage extends Component {
                           </div>
                         )}
                         {this.state.loading && <div>Loading...</div>}
-                        <LoadingSuccessFail
-                          loading={this.state.loading}
-                          success={this.state.success}
-                          fail={this.state.fail}
-                          successCallback={this.successCallback}
-                          failCallback={this.failCallback}
-                        />
                         <div className="custom-control custom-control-alternative custom-checkbox">
                           <input
                             className="custom-control-input"
@@ -304,6 +285,7 @@ class LoginPage extends Component {
                               type="button"
                               className="btn btn-primary my-4"
                               onClick={this.onSubmitRegister}
+                              disabled={this.state.loading}
                             >
                               Sign Up
                             </button>
@@ -312,6 +294,7 @@ class LoginPage extends Component {
                               type="button"
                               className="btn btn-primary my-4"
                               onClick={this.onSubmitLogin}
+                              disabled={this.state.loading}
                             >
                               Sign in
                             </button>
