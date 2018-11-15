@@ -3,7 +3,8 @@ import { combineReducers } from "redux";
 let authInitialState = {
   loggedIn: false,
   _id: null,
-  email: null
+  email: null,
+  profilePhoto: null
 };
 
 const authReducer = (state = authInitialState, action) => {

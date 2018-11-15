@@ -14,22 +14,37 @@ module.exports = new LocalStrategy(
     passwordField: "password"
   },
   async (email, password, done) => {
-    try {
-      const userDocument = await UserModel.findOne({
-        email: email.trim()
-      }).exec();
-      const passwordsMatch = await bcrypt.compare(
-        password.trim(),
-        userDocument.passwordHash
-      );
-
-      if (passwordsMatch) {
-        return done(null, userDocument);
-      } else {
-        return done(null, false, { message: "Incorrect password" });
+    return UserModel.findOne({ email: email.trim() }, function(err, user) {
+      if (err) {
+        return done(err);
       }
-    } catch (error) {
-      done(error);
-    }
+      if (!user) {
+        const error = new Error("Incorrect email or password");
+        error.name = "IncorrectCredentialsError";
+
+        return done(error);
+      }
+      if (!user.passwordHash) {
+        const error = new Error(
+          "No password stored, login via social provider"
+        );
+        error.name = "NoPasswordStored";
+        return done(error);
+      }
+
+      return user.comparePassword(password, (passwordErr, isMatch) => {
+        if (err) {
+          return done(err);
+        }
+
+        if (!isMatch) {
+          const error = new Error("Incorrect email or password");
+          error.name = "IncorrectCredentialsError";
+          return done(error);
+        }
+
+        return done(null, user);
+      });
+    });
   }
 );

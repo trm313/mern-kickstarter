@@ -2,9 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Auth from "../../utils/auth";
 
+import ProfilePhoto from "./ProfilePhoto";
 import Logo from "../../assets/style/img/brand/white.png";
 
 const Header = () => {
+  let user = Auth.getUserData();
   return (
     <header className="header-global">
       <nav
@@ -223,6 +225,9 @@ const Header = () => {
                     <span className="nav-link-inner--text">Login</span>
                   </Link>
                 </li>
+              )}
+              {Auth.isUserAuthenticated() && (
+                <ProfilePhoto profilePhoto={user.profilePhoto} />
               )}
             </ul>
           </div>

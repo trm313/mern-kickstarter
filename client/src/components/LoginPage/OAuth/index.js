@@ -8,17 +8,19 @@ export default class OAuth extends Component {
 
   componentDidMount() {
     const { socket, provider } = this.props;
-    socket.on(provider, user => {
+    socket.on("login", user => {
       if (!this.popup) {
         // BUG: When logging in via one provider -> logout -> log back in via a different one => error: can't access this.popup.close()
         // Somehow this works..?
+        console.error("Cant close popup");
+      } else if (!this.popup.close()) {
         console.error("Cant close popup");
       } else {
         this.popup.close();
       }
 
       this.setState({ user }, () => {
-        this.props.logInUser(user._id, user.email);
+        this.props.logInUser(user._id, user.email, user.profilePhoto);
       });
     });
   }
@@ -69,8 +71,6 @@ export default class OAuth extends Component {
     const { email } = this.state.user;
     const { provider } = this.props;
     const { disabled } = this.state;
-
-    console.log(this.state);
 
     return (
       <div className="btn btn-neutral btn-icon" onClick={this.startAuth}>

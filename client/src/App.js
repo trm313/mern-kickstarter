@@ -49,7 +49,6 @@ class App extends Component {
   }
 
   render() {
-    console.log("isUserAuthenticated", Auth.isUserAuthenticated());
     return (
       <Router>
         <div className="App">

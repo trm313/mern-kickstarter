@@ -7,11 +7,12 @@ export const getUserInfo = () => dispatch => {
   // Return userInfo to 'LOGIN_USER'
 };
 
-export const logInUser = (_id, email) => dispatch => {
+export const logInUser = (_id, email, profilePhoto) => dispatch => {
   let data = {
     loggedIn: true,
     _id: _id,
-    email: email
+    email: email,
+    profilePhoto: profilePhoto || null
   };
   console.log(data);
   dispatch(actions.returnUserData(data));

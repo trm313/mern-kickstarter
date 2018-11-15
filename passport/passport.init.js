@@ -21,7 +21,11 @@ module.exports = () => {
   // information. Normally, you would save the user to the database
   // in this callback and it would be customized for each provider.
   const callback = (req, accessToken, refreshToken, profile, cb) => {
-    // console.log("social auth cb >", accessToken, profile);
+    // console.log("social auth cb >", accessToken, profile.emails, profile);
+
+    if (!profile.emails) {
+      cb("Error: Email not returned");
+    }
 
     UserModel.findOne(
       {
@@ -36,7 +40,7 @@ module.exports = () => {
         if (user) {
           if (user.accounts[profile.provider] == undefined) {
             user.accounts[profile.provider] = profile.id;
-            user.profilePhoto = profile.photos[0].value;
+            user.profilePhoto = profile.photos[0].value || null;
             user.save();
             cb(null, user);
           } else {
@@ -46,7 +50,7 @@ module.exports = () => {
           let newUser = new UserModel();
           newUser.email = profile.emails[0].value;
           newUser.accounts[profile.provider] = profile.id;
-          newUser.profilePhoto = profile.photos[0].value;
+          newUser.profilePhoto = profile.photos[0].value || null;
           newUser.save();
           cb(null, newUser);
         }

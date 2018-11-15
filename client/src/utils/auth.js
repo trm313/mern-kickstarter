@@ -3,22 +3,25 @@ import axios from "axios";
 
 class Auth {
   /**
-   * Authenticate a user. Save a token string in LocalStorage
-   * @param {string} token
+   * Attempt to return user data
    */
   static authenticateUser() {
+    const returnUserData = user => ({
+      type: "LOGIN_USER",
+      payload: {
+        loggedIn: true,
+        _id: user._id,
+        email: user.email,
+        profilePhoto: user.profilePhoto
+      }
+    });
+
     axios
       .get("/v1/user")
       .then(response => {
-        console.log(response.data);
-        store.dispatch(returnUserData(response.data));
+        store.dispatch(returnUserData(response.data.user));
       })
       .catch(error => {});
-
-    const returnUserData = user => ({
-      type: "LOGIN_USER",
-      payload: { loggedIn: true, _id: user._id, email: user.email }
-    });
   }
 
   /**
@@ -28,6 +31,14 @@ class Auth {
   static isUserAuthenticated() {
     let state = store.getState();
     return state.auth.loggedIn;
+  }
+
+  /**
+   * Get User Data
+   */
+  static getUserData() {
+    let state = store.getState();
+    return state.auth;
   }
 
   /**
