@@ -27,7 +27,8 @@ export default class OAuth extends Component {
       }
 
       this.setState({ user }, () => {
-        this.props.logInUser(user._id, user.email, user.profilePhoto);
+        // this.props.logInUser(user._id, user.email, user.profilePhoto);
+        this.props.returnOAuthData(user);
       });
     });
   }

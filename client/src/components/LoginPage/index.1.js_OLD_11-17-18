@@ -6,26 +6,14 @@ import qs from "query-string";
 import io from "socket.io-client";
 import OAuth from "./OAuth";
 
-import LoginForm from "./LoginForm";
 import ErrorAlert from "../UI/ErrorAlert";
 import LoadingSuccessFailure from "../UI/LoadingSuccessFailure";
 
 import { logInUser } from "./operations";
-const socket = io("http://localhost:3001");
-const providers = ["twitter", "google"];
 
-const resetStatusState = {
-  loading: false,
-  error: null,
-  errorMsg: null,
-  reqStatus: "pending"
-};
-const setLoadingState = {
-  loading: true,
-  error: null,
-  errorMsg: null,
-  reqStatus: "loading"
-};
+const socket = io("http://localhost:3001");
+
+const providers = ["twitter", "google"];
 
 class LoginPage extends Component {
   constructor(props) {
@@ -39,27 +27,16 @@ class LoginPage extends Component {
       errorMsg: null,
       loading: false,
       register: qs.parse(this.props.location.search).register ? true : false,
-      reqStatus: "pending", // pending || loading || success || failed,
-      returnedUser: null
+      reqStatus: "pending"
     };
   }
 
   successCallback = () => {
-    // Called from LoadingSuccessFailure
-    let user = {
-      _id: this.state.returnedUser._id,
-      email: this.state.returnedUser.email,
-      photo: this.state.returnedUser.profilePhoto
-    };
-    this.props.logInUser(user._id, user.email, user.photo);
+    //
   };
 
   failureCallback = () => {
-    // Called from LoadingSuccessFailure
-    this.setState({
-      loading: false,
-      reqStatus: "pending"
-    });
+    //
   };
 
   toggleForm = () => {
@@ -81,14 +58,10 @@ class LoginPage extends Component {
 
   onSubmitLogin = () => {
     if (!this.state.email || !this.state.password) {
-      this.setState({
-        error: true,
-        errorMsg: "Please fill out all fields",
-        reqStatus: "pending"
-      });
+      this.setState({ error: true, errorMsg: "Please fill out all fields" });
     } else {
       // Set loading
-      this.setState(setLoadingState, () => {
+      this.setState({ loading: true, error: null, errorMsg: null }, () => {
         // Post to server route /login
         var data = {
           email: this.state.email,
@@ -98,21 +71,27 @@ class LoginPage extends Component {
         axios
           .post("/v1/auth/login", data)
           .then(response => {
-            this.setState({
-              error: null,
-              errorMsg: null,
-              reqStatus: "success",
-              returnedUser: response.data
-            });
-            // this.props.logInUser(response.data._id, response.data.email);
+            if (!response.data.success) {
+              console.log(response.data);
+              this.setState({
+                error: true,
+                errorMsg: response.data.message,
+                loading: false
+              });
+            } else {
+              this.setState({
+                error: null,
+                errorMsg: null
+              });
+              this.props.logInUser(response.data._id, response.data.email);
+            }
           })
           .catch(error => {
-            console.log("response.data", error.response.data);
+            console.log("loginError", error);
             this.setState({
               error: true,
-              errorMsg: error.response.data.message || "Login failed",
-              loading: false,
-              reqStatus: "failed"
+              errorMsg: "Login failed",
+              loading: false
             });
           });
       });
@@ -149,16 +128,24 @@ class LoginPage extends Component {
         axios
           .post("/v1/auth/register", data)
           .then(response => {
-            this.setState({
-              error: null,
-              errorMsg: null
-            });
-            this.props.logInUser(response.data._id, response.data.email);
+            if (!response.data.success) {
+              this.setState({
+                loading: false,
+                error: true,
+                errorMsg: response.data.message
+              });
+            } else {
+              this.setState({
+                error: null,
+                errorMsg: null
+              });
+              this.props.logInUser(response.data._id, response.data.email);
+            }
           })
           .catch(error => {
             this.setState({
               error: true,
-              errorMsg: error.response.data.message || "Signup failed",
+              errorMsg: "Signup failed",
               loading: false
             });
           });
@@ -167,11 +154,7 @@ class LoginPage extends Component {
   };
 
   setLoading = bool => {
-    if (bool) {
-      this.setState({ loading: bool, reqStatus: "loading" });
-    } else {
-      this.setState({ loading: bool });
-    }
+    this.setState({ loading: bool });
   };
 
   renderOAuthButtons = () => {
@@ -184,14 +167,9 @@ class LoginPage extends Component {
           logInUser={this.props.logInUser}
           setLoading={this.setLoading}
           loading={this.state.loading}
-          returnOAuthData={this.returnOAuthData}
         />
       );
     });
-  };
-
-  returnOAuthData = user => {
-    this.setState({ returnedUser: user, reqStatus: "success" });
   };
 
   render() {
@@ -248,16 +226,96 @@ class LoginPage extends Component {
                         failureCallback={this.failureCallback}
                         completionDelay={1500}
                       />
-                      <LoginForm
-                        email={this.state.email}
-                        password={this.state.password}
-                        confirmPassword={this.state.confirmPassword}
-                        register={this.state.register}
-                        onChange={this.onChange}
-                        loading={this.state.loading}
-                        onSubmitLogin={this.onSubmitLogin}
-                        onSubmitRegister={this.onSubmitRegister}
-                      />
+                      <form role="form">
+                        <div className="form-group mb-3">
+                          <div className="input-group input-group-alternative">
+                            <div className="input-group-prepend">
+                              <span className="input-group-text">
+                                <i className="ni ni-email-83" />
+                              </span>
+                            </div>
+                            <input
+                              className="form-control"
+                              placeholder="Email"
+                              type="email"
+                              name="email"
+                              onChange={this.onChange}
+                              value={this.state.email}
+                            />
+                          </div>
+                        </div>
+                        <div className="form-group">
+                          <div className="input-group input-group-alternative">
+                            <div className="input-group-prepend">
+                              <span className="input-group-text">
+                                <i className="ni ni-lock-circle-open" />
+                              </span>
+                            </div>
+                            <input
+                              className="form-control"
+                              placeholder="Password"
+                              type="password"
+                              name="password"
+                              onChange={this.onChange}
+                              value={this.state.password}
+                            />
+                          </div>
+                        </div>
+                        {this.state.register && (
+                          <div className="form-group">
+                            <div className="input-group input-group-alternative">
+                              <div className="input-group-prepend">
+                                <span className="input-group-text">
+                                  <i className="ni ni-lock-circle-open" />
+                                </span>
+                              </div>
+                              <input
+                                className="form-control"
+                                placeholder="Confirm Password"
+                                type="password"
+                                name="confirmPassword"
+                                onChange={this.onChange}
+                                value={this.state.confirmPassword}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="custom-control custom-control-alternative custom-checkbox">
+                          <input
+                            className="custom-control-input"
+                            id=" customCheckLogin"
+                            type="checkbox"
+                          />
+                          <label
+                            className="custom-control-label"
+                            for="customCheckLogin"
+                          >
+                            <span>Remember me</span>
+                          </label>
+                        </div>
+                        <div className="text-center">
+                          {this.state.register ? (
+                            <button
+                              type="button"
+                              className="btn btn-primary my-4"
+                              onClick={this.onSubmitRegister}
+                              disabled={this.state.loading}
+                            >
+                              Sign Up
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="btn btn-primary my-4"
+                              onClick={this.onSubmitLogin}
+                              disabled={this.state.loading}
+                            >
+                              Sign in
+                            </button>
+                          )}
+                        </div>
+                      </form>
                     </div>
                   </div>
                   <div className="row mt-3">
