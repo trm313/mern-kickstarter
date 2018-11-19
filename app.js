@@ -134,6 +134,12 @@ app.use("/v1/auth", authRoutes);
 const userRoutes = require("./routes/v1/user");
 app.use("/v1/user", userRoutes);
 
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.use("*", (req, res) => {
+  res.sendFile(path.join(__dirname + "/client/build/index.html"));
+});
+
 // module.exports = app;
 function normalizePort(val) {
   var port = parseInt(val, 10);
