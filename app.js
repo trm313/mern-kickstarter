@@ -135,6 +135,8 @@ const userRoutes = require("./routes/v1/user");
 app.use("/v1/user", userRoutes);
 
 // module.exports = app;
-server.listen(3001, () => {
-  console.log("Server running on port 3001...");
+var port = normalizePort(process.env.PORT || "3001");
+app.set("port", port);
+server.listen(port, () => {
+  console.log("Server running on port " + port + "...");
 });
