@@ -135,6 +135,21 @@ const userRoutes = require("./routes/v1/user");
 app.use("/v1/user", userRoutes);
 
 // module.exports = app;
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
 var port = normalizePort(process.env.PORT || "3001");
 app.set("port", port);
 server.listen(port, () => {
