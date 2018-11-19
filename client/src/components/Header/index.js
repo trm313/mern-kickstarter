@@ -5,30 +5,54 @@ import Auth from "../../utils/auth";
 import ProfilePhoto from "./ProfilePhoto";
 import Logo from "../../assets/style/img/brand/white.png";
 
-const Header = () => {
-  let user = Auth.getUserData();
-  return (
-    <header className="header-global">
+class Header extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      showCollapsedNav: false
+    };
+  }
+
+  toggleCollapsedNav = () => {
+    console.log("toggleCollapsedNav");
+    this.setState({ showCollapsedNav: !this.state.showCollapsedNav });
+  };
+
+  closeCollapsedNav = () => {
+    this.setState({ showCollapsedNav: false });
+  };
+
+  render() {
+    let user = Auth.getUserData();
+    return (
       <nav
         id="navbar-main"
-        className="navbar navbar-main navbar-expand-lg navbar-dark bg-default headroom"
+        className="navbar navbar-main navbar-expand-lg navbar-dark bg-default"
       >
         <div className="container">
           <Link to="/" className="navbar-brand mr-lg-5">
             <img src={Logo} />
           </Link>
           <button
+            onClick={this.toggleCollapsedNav}
             className="navbar-toggler"
             type="button"
-            data-toggle="collapse"
-            data-target="#navbar_global"
-            aria-controls="navbar_global"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
           >
             <span className="navbar-toggler-icon" />
           </button>
-          <div className="navbar-collapse collapse" id="navbar_global">
+          <div
+            className={
+              "navbar-collapse collapse" +
+              (this.state.showCollapsedNav ? " show" : "")
+            }
+            id="navbar_global"
+            data-toggle="collapse"
+            data-target="#navbar-default"
+            aria-controls="navbar-default"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
             <div className="navbar-collapse-header">
               <div className="row">
                 <div className="col-6 collapse-brand">
@@ -45,6 +69,7 @@ const Header = () => {
                     aria-controls="navbar_global"
                     aria-expanded="false"
                     aria-label="Toggle navigation"
+                    onClick={this.toggleCollapsedNav}
                   >
                     <span />
                     <span />
@@ -147,7 +172,11 @@ const Header = () => {
                 </div>
               </li>
               <li className="nav-item">
-                <Link to="/dashboard" className="nav-link">
+                <Link
+                  to="/dashboard"
+                  className="nav-link"
+                  onClick={this.closeCollapsedNav}
+                >
                   <i className="ni ni-collection d-lg-none" />
                   <span className="nav-link-inner--text">Dashboard</span>
                 </Link>
@@ -217,7 +246,7 @@ const Header = () => {
                   </Link>
                 </li>
               ) : (
-                <li className="nav-item d-none d-lg-block ml-lg-4">
+                <li className="nav-item  d-lg-block ml-lg-4">
                   <Link to="/login" className="btn btn-neutral btn-icon">
                     <span className="btn-inner--icon">
                       <i className="fa fa-user-circle mr-2" />
@@ -226,6 +255,7 @@ const Header = () => {
                   </Link>
                 </li>
               )}
+
               {Auth.isUserAuthenticated() && (
                 <ProfilePhoto profilePhoto={user.profilePhoto} />
               )}
@@ -233,8 +263,8 @@ const Header = () => {
           </div>
         </div>
       </nav>
-    </header>
-  );
-};
+    );
+  }
+}
 
 export default Header;

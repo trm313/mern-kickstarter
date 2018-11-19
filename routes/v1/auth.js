@@ -24,7 +24,7 @@ router.post("/register", async (req, res) => {
       if (err) {
         console.log(err);
         if (err.code === 11000) {
-          return res.status(200).json({
+          return res.status(401).json({
             success: false,
             message: "This email is already in use"
           });
@@ -48,18 +48,18 @@ router.post("/login", (req, res) => {
   passport.authenticate("local", { session: false }, (error, user) => {
     if (error) {
       if (error.name === "IncorrectCredentialsError") {
-        return res.status(200).json({
+        return res.status(401).json({
           success: false,
           message: error.message
         });
       }
       if (error.name === "NoPasswordStored") {
-        return res.status(200).json({
+        return res.status(401).json({
           success: false,
           message: error.message
         });
       }
-      return res.status(200).json({
+      return res.status(400).json({
         success: false,
         message: "Login failed"
       });
@@ -98,6 +98,7 @@ router.post("/login", (req, res) => {
       res.status(200).send({
         success: true,
         email: user.email,
+        profilePhoto: user.profilePhoto,
         _id: user._id
       });
     });

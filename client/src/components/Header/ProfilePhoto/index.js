@@ -7,6 +7,7 @@ export default class ProfilePhoto extends Component {
     return (
       <img
         height="50"
+        width="50"
         src={this.props.profilePhoto || userCircle}
         className="rounded-circle"
       />
